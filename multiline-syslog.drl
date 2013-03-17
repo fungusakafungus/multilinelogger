@@ -1,0 +1,41 @@
+import org.graylog2.messagehandlers.gelf.GELFMessage
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.net.InetAddress;
+
+/*
+Raw Syslog: multilinelogger[2099]: first line#012second line
+
+(\\w+)(\\[\\d+\\]): (.*)
+*/
+
+rule "Syslog Multiline Logging to GELF"
+    when
+        m : GELFMessage()
+    then
+        Matcher matcher = Pattern.compile("(\\w+)(?:\\[(\\d+)\\])?: (.*)").matcher(m.getShortMessage());
+
+        if (matcher.find()) {
+		m.setFacility(matcher.group(1));
+		Matcher lineMatcher = Pattern.compile("^(.*?)#012").matcher(matcher.group(3));
+		if (lineMatcher.find()) {
+			m.setShortMessage(lineMatcher.group(1));
+		}
+		Pattern escapePattern = Pattern.compile("#[0-7]{3}");
+		Matcher escapeMatcher = escapePattern.matcher(matcher.group(3));
+		StringBuffer sb = new StringBuffer();
+		while (escapeMatcher.find()) {
+			String escaped = escapeMatcher.group(0).substring(1);
+			Character unescaped = (char) Byte.parseByte(escaped, 8);
+
+			escapeMatcher.appendReplacement(sb, unescaped.toString());
+		}
+		escapeMatcher.appendTail(sb);
+
+		String fullMessage = sb.toString();
+
+		m.setFullMessage(fullMessage);
+		m.addAdditionalData("_pid",matcher.group(2));
+	}
+end
+

@@ -35,17 +35,19 @@ facilities = {
         'local6': syslog.LOG_LOCAL6,
         'local7': syslog.LOG_LOCAL7,
         }
-#     Logger makes entries in the system log.  It provides a shell command interface to the syslog(3) system log module.
 
-#     Write the message to log; if the -f flag is not provided, standard input is logged.
+description = """
+Logger makes entries in the system log.  It provides a shell command interface to the syslog(3) system log module.
+Write the message to log; if the -f flag is not provided, standard input is logged.
+The logger utility exits 0 on success, and >0 if an error occurs.
+"""
 
-#     The logger utility exits 0 on success, and >0 if an error occurs.
-parser = OptionParser()
+parser = OptionParser(description=description.strip())
 parser.add_option("-i", dest="pid", metavar="pid", help="Log the specified number as the process process id.")
 parser.add_option("-s", dest="stderr", action="store_true", help="Log the message to standard error, as well as the system log.")
 parser.add_option("-f", dest="filename", metavar="file", default='-', help="Log the specified file.")
 parser.add_option("-p", dest="priority", metavar="pri", default="user.notice", help="Enter the message with the specified priority.  The priority is specified as a ``facility.level'' pair.  For example, ``-p local3.info'' logs the message(s) as informational level in the local3 facility.  The default is ``user.notice.''")
-parser.add_option("-t", dest="tag", metavar="tag", default="multilinesyslog", help="Mark the message in the log with the specified tag.")
+parser.add_option("-t", dest="tag", metavar="tag", default="multilinelogger", help="Mark the message in the log with the specified tag.")
 
 (options, args) = parser.parse_args()
 
