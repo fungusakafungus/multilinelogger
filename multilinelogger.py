@@ -63,7 +63,7 @@ def main():
     fac = facilities.get(facility, 'user')
     prio = priorities.get(priority, 'notice')
 
-    syslog.openlog(tag, 0, syslog.LOG_LOCAL2)
+    syslog.openlog(tag, 0, fac)
     if options.filename == '-':
         stream = sys.stdin
     else:
@@ -71,7 +71,7 @@ def main():
     message = stream.read().strip()
     if message:
         syslog.syslog(prio, message)
-    if options.stderr:
-        sys.stderr.write(tag + ': ')
-        sys.stderr.write(message)
-        sys.stderr.write("\n")
+        if options.stderr:
+            sys.stderr.write(tag + ': ')
+            sys.stderr.write(message)
+            sys.stderr.write("\n")
