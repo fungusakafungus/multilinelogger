@@ -18,6 +18,8 @@ setup(
         'console_scripts': [
             'multilinelogger = multilinelogger:main',
         ],
-    }
+    },
+    tests_require = ['mock'],
+    test_suite = 'test_multilinelogger',
 )
 
