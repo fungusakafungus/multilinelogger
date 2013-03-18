@@ -55,22 +55,25 @@ def main():
     tag = options.tag
     if options.pid:
         tag = tag + '[' + options.pid + ']'
-    facility, priority = options.priority.split('.')
+    try:
+        facility, priority = options.priority.split('.')
+    except ValueError:
+        facility, priority = options.priority, ''
     if not priority:
         priority = 'notice'
     if not facility:
         facility = 'user'
-    fac = facilities.get(facility, 'user')
-    prio = priorities.get(priority, 'notice')
+    facility_numeric = facilities.get(facility, 'user')
+    priority_numeric = priorities.get(priority, 'notice')
 
-    syslog.openlog(tag, 0, fac)
+    syslog.openlog(tag, 0, facility_numeric)
     if options.filename == '-':
         stream = sys.stdin
     else:
         stream = open(options.filename, 'r')
     message = stream.read().strip()
     if message:
-        syslog.syslog(prio, message)
+        syslog.syslog(priority_numeric, message)
         if options.stderr:
             sys.stderr.write(tag + ': ')
             sys.stderr.write(message)
